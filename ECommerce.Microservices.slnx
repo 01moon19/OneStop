@@ -1,0 +1,10 @@
+<Solution>
+  <Project Path="ecommerce-frontend/ecommerce-frontend.esproj">
+    <Build />
+    <Deploy />
+  </Project>
+  <Project Path="ECommerce.APIGateway/ECommerce.APIGateway.csproj" Id="694fd778-efa2-49e4-ba68-7bd3a68ca874" />
+  <Project Path="ECommerce.OrderService/ECommerce.OrderService.csproj" Id="3bc98188-3b02-4d09-bfa6-f1252a61b8f3" />
+  <Project Path="ECommerce.ProductService/ECommerce.ProductService.csproj" />
+  <Project Path="ECommerce.UserService/ECommerce.UserService.csproj" Id="b9b8fb6c-04f6-49f6-901a-4aad8d64f642" />
+</Solution>
