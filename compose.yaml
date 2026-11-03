@@ -1,0 +1,92 @@
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: onestop-sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+      MSSQL_SA_PASSWORD: "${SQL_SA_PASSWORD:?Set SQL_SA_PASSWORD in .env}"
+    ports:
+      - "127.0.0.1:14333:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    restart: unless-stopped
+
+  userservice:
+    image: ecommerce-userservice:dev
+    container_name: onestop-userservice
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ConnectionStrings__UserConnection: "Server=sqlserver,1433;Database=ECommerce_UserDB;User Id=sa;Password=${SQL_SA_PASSWORD};Encrypt=True;TrustServerCertificate=True"
+      Jwt__Key: "${JWT_KEY:?Set JWT_KEY in .env}"
+    ports:
+      - "127.0.0.1:8081:8080"
+    depends_on:
+      - sqlserver
+    restart: unless-stopped
+
+  productservice:
+    image: ecommerce-productservice:dev
+    container_name: onestop-productservice
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ConnectionStrings__ProductConnection: "Server=sqlserver,1433;Database=ECommerce_ProductDB;User Id=sa;Password=${SQL_SA_PASSWORD};Encrypt=True;TrustServerCertificate=True"
+      Jwt__Key: "${JWT_KEY:?Set JWT_KEY in .env}"
+      InternalApi__Key: "${INTERNAL_API_KEY:?Set INTERNAL_API_KEY in .env}"
+    ports:
+      - "127.0.0.1:8082:8080"
+    depends_on:
+      - sqlserver
+    restart: unless-stopped
+
+  orderservice:
+    image: ecommerce-orderservice:dev
+    container_name: onestop-orderservice
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ASPNETCORE_HTTP_PORTS: "8080"
+
+      ConnectionStrings__OrderConnection: "Server=sqlserver,1433;Database=ECommerce_OrderDB;User Id=sa;Password=${SQL_SA_PASSWORD};Encrypt=True;TrustServerCertificate=True"
+
+      Jwt__Key: "${JWT_KEY:?Set JWT_KEY in .env}"
+      InternalApi__Key: "${INTERNAL_API_KEY:?Set INTERNAL_API_KEY in .env}"
+
+      Services__ProductService: "http://productservice:8080/"
+
+    ports:
+      - "127.0.0.1:8083:8080"
+
+    depends_on:
+      - sqlserver
+      - productservice
+
+    restart: unless-stopped
+
+  
+  gateway:
+    image: ecommerce-gateway:dev
+    container_name: onestop-gateway
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ASPNETCORE_HTTP_PORTS: "8080"
+
+      ReverseProxy__Clusters__user-cluster__Destinations__user__Address: "http://userservice:8080/"
+      ReverseProxy__Clusters__product-cluster__Destinations__product__Address: "http://productservice:8080/"
+      ReverseProxy__Clusters__order-cluster__Destinations__order__Address: "http://orderservice:8080/"
+
+    ports:
+      - "127.0.0.1:8080:8080"
+
+    depends_on:
+      - userservice
+      - productservice
+      - orderservice
+
+    restart: unless-stopped
+
+
+volumes:
+  sqlserver_data:
