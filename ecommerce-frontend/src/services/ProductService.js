@@ -1,10 +1,11 @@
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import { API_BASE_URL } from "./apiBaseUrl";
 
 export async function getProducts(category = null) {
-    const url = new URL(`${API_BASE_URL}/api/products`, 
-                       window.location.origin 
-                       );
+    const url = new URL(
+        `${API_BASE_URL}/api/products`,
+        window.location.origin
+    );
 
     if (category) {
         url.searchParams.set("category", category);
