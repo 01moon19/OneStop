@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { getProducts } from "C:/Users/MayankSingh/source/repos/ECommerce/ecommerce-frontend/src/services/ProductService.js";
+import { getProducts } from "../services/ProductService";
 import ProductCard from "./ProductCard";
 import { Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
