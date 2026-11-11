@@ -1,5 +1,9 @@
 
-import { API_BASE_URL } from "./apiBaseUrl";
+const configuredApiBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
+
+export const API_BASE_URL = configuredApiBaseUrl
+    ? configuredApiBaseUrl.replace(/\/+$/, "")
+    : "";
 
 export async function getProducts(category = null) {
     const url = new URL(
