@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import { getProducts } from "../services/productService";
+import { getProducts } from "../services/ProductService";
 import {
     createProduct,
     updateProduct,
